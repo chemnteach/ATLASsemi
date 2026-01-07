@@ -82,3 +82,11 @@ temp/
 *_confidential.*
 *_topsecret.*
 *.recipe
+
+# Continuous Claude - Cache and local settings
+.claude/cache/
+.claude/settings.local.json
+
+# Working memory - Ledgers and handoffs
+# thoughts/ - intentionally NOT ignored (these should be committed for session continuity)
+# Exception: Don't commit if contains proprietary Tier 2/3 fab data
