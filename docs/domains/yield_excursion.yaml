@@ -1,0 +1,192 @@
+domain:
+  name: "yield_excursion"
+  mode: "excursion"  # Mode A: Rapid response
+
+  description: |
+    Yield excursion response mode for rapid containment and root cause analysis.
+    Focus: Fast stabilization, scope definition, interim actions.
+
+  # 8D phases emphasized in this mode
+  eight_d_emphasis:
+    - D0  # Preparation & trigger
+    - D1  # Team formation
+    - D2  # Problem definition
+    - D3  # Interim containment (CRITICAL for excursions)
+    - D4  # Root cause analysis
+    - D5  # Permanent corrective actions
+    - D6  # Validation
+
+  # Typical timeline
+  typical_timeline:
+    d0_to_d3: "4-24 hours"     # Containment must be fast
+    d3_to_d6: "1-7 days"       # Analysis and fix
+    d6_to_d8: "1-4 weeks"      # Prevention and documentation
+
+  # Keywords for detection
+  keywords:
+    - excursion
+    - yield drop
+    - spc alert
+    - out of spec
+    - defect spike
+    - tool drift
+    - sudden change
+    - production hold
+    - lot disposition
+
+  # Typical data sources
+  data_sources:
+    critical:
+      - spc_charts       # When did it start?
+      - fdc_alarms       # Any tool alarms?
+      - metrology        # Measurement data
+      - defect_inspection # What defect types?
+
+    secondary:
+      - tool_logs        # What changed on tool?
+      - pm_history       # Recent maintenance?
+      - recipe_history   # Recipe changes?
+      - material_lots    # New material lots?
+
+  # Clarification questions (adaptive, not checklist)
+  clarification_questions:
+    timing:
+      - "When was this first detected?"
+      - "When did it likely start? (may be earlier than detection)"
+      - "Is it still ongoing or has it stopped?"
+
+    scope:
+      - "Is this isolated to specific lots or widespread?"
+      - "Which tools are affected?"
+      - "Which products or layers?"
+      - "Single lot or multiple lots?"
+
+    impact:
+      - "How many lots are on hold?"
+      - "What's the production impact?"
+      - "Any customer-destined material affected?"
+
+    changes:
+      - "Any recent tool PM or service?"
+      - "Any recipe changes?"
+      - "New material lots introduced?"
+      - "Any process changes in upstream steps?"
+
+    data:
+      - "What data do you have access to now?"
+      - "What data do you trust vs not trust?"
+      - "Any known data quality issues?"
+
+  # Common root cause categories
+  root_cause_categories:
+    equipment:
+      - tool_drift        # Gradual parameter shift
+      - pm_induced        # Post-maintenance baseline shift
+      - hardware_failure  # Component failure
+      - tool_matching     # Mismatch between paired tools
+
+    process:
+      - recipe_error      # Wrong recipe or parameters
+      - upstream_impact   # Issue from prior step
+      - process_window    # Operating outside window
+
+    material:
+      - incoming_defect   # Bad incoming material
+      - material_lot      # New material lot issue
+      - chemical_age      # Expired or degraded chemical
+
+    environmental:
+      - facility          # Cleanroom environment
+      - utilities         # Power, water, gas
+
+    human:
+      - procedure_error   # Didn't follow SOP
+      - training          # Insufficient training
+      - communication     # Missed handoff
+
+  # Containment strategies
+  containment_strategies:
+    - hold_suspect_lots         # Immediate hold
+    - hold_all_tool_lots        # Hold all from affected tool
+    - quarantine_material       # Hold material lot
+    - switch_to_backup_tool     # Route to alternate tool
+    - revert_recipe             # Roll back to previous
+    - increase_inspection       # 100% inspection
+    - add_monitoring            # Extra SPC/FDC monitoring
+
+  # Hypothesis ranking criteria
+  hypothesis_ranking:
+    high_priority:
+      - recent_change           # Something changed recently
+      - known_failure_mode      # Seen this before
+      - multiple_data_sources   # Confirmed by multiple sources
+
+    medium_priority:
+      - plausible_mechanism     # Makes sense technically
+      - partial_data_support    # Some evidence
+
+    low_priority:
+      - speculation             # No data support
+      - unlikely_timing         # Timeline doesn't match
+
+  # Quality standards
+  quality_standards:
+    d2_problem_definition:
+      - timeline_established        # When it started
+      - scope_quantified            # How many lots/tools
+      - symptom_characterized       # What exactly is wrong
+
+    d3_containment:
+      - lots_identified             # Which lots affected
+      - interim_action_taken        # Hold, quarantine, etc.
+      - customer_impact_assessed    # Any shipped material?
+
+    d4_root_cause:
+      - hypothesis_tested           # Not just speculation
+      - data_supports_conclusion    # Evidence-based
+      - mechanism_explained         # Why this happened
+
+  # Common pitfalls
+  common_pitfalls:
+    - jumping_to_solution         # Don't skip root cause
+    - insufficient_containment    # Hold too few lots
+    - data_quality_assumptions    # Trust bad data
+    - correlation_vs_causation    # A happened before B ≠ A caused B
+    - single_data_point           # Need multiple confirmation
+
+  # Prompt customizations
+  prompt_customizations:
+    narrative_intake: |
+      Focus on urgency and production impact.
+      Extract timeline (when detected, when started).
+      Identify what's on hold and customer risk.
+
+    clarification_priority: |
+      Prioritize timing, scope, and impact questions first.
+      Containment is time-critical for excursions.
+
+    analysis_focus: |
+      Emphasize D3 (containment) and D4 (root cause).
+      Look for recent changes (PM, recipe, material).
+      Check for similar historical excursions.
+
+  # Knowledge graph queries
+  knowledge_graph_queries:
+    find_similar_excursions: |
+      MATCH (e:Excursion)
+      WHERE e.symptom CONTAINS $symptom
+      AND e.layer = $layer
+      AND e.date > date().subtract(years=2)
+      RETURN e.excursion_id, e.root_cause, e.resolution
+      ORDER BY e.date DESC
+      LIMIT 10
+
+    find_related_tools: |
+      MATCH (tool:Tool {name: $tool_name})-[:MATCHED_WITH]->(related:Tool)
+      RETURN related.name, related.status
+
+    find_pm_history: |
+      MATCH (tool:Tool {name: $tool_name})-[:HAD_PM]->(pm:Maintenance)
+      WHERE pm.date > $start_date
+      RETURN pm.date, pm.type, pm.technician
+      ORDER BY pm.date DESC

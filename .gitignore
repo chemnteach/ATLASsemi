@@ -1,0 +1,84 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Logs
+*.log
+logs/
+
+# Environment variables (IMPORTANT - contains API keys)
+.env
+.env.local
+config/runtime_config.yaml  # May contain sensitive info
+
+# Knowledge base data
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Vector store data
+chroma_data/
+vector_store/
+
+# Session data (may contain proprietary info)
+sessions/
+reports/
+*.8d.md
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# MyPy
+.mypy_cache/
+
+# Proprietary data (CRITICAL)
+# Add any patterns for proprietary fab data
+*_confidential.*
+*_topsecret.*
+*.recipe
