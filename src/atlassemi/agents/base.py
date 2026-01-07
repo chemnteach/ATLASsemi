@@ -198,9 +198,52 @@ class BaseAgent(ABC):
             # For testing without actual LLM
             return f"[Mock LLM response for: {prompt[:100]}...]"
 
-        # TODO: Implement actual LLM call via client
-        # This will be implemented when we add the model router
-        raise NotImplementedError("LLM call not yet implemented")
+        # Call model via client
+        try:
+            response_text, input_tokens, output_tokens = client.generate(
+                prompt=prompt,
+                max_tokens=max_tokens
+            )
+
+            # Track usage if router is available
+            if self.model_router:
+                cost_usd = self._calculate_cost(
+                    client.config,
+                    input_tokens,
+                    output_tokens
+                )
+                self.model_router.track_usage(
+                    task_type=self._get_task_type(),
+                    input_tokens=input_tokens,
+                    output_tokens=output_tokens,
+                    cost_usd=cost_usd
+                )
+
+            return response_text
+
+        except Exception as e:
+            raise RuntimeError(f"LLM call failed: {e}")
+
+    def _calculate_cost(
+        self,
+        config: Any,
+        input_tokens: int,
+        output_tokens: int
+    ) -> float:
+        """
+        Calculate cost for LLM call.
+
+        Args:
+            config: ModelConfig with pricing
+            input_tokens: Input token count
+            output_tokens: Output token count
+
+        Returns:
+            Cost in USD
+        """
+        input_cost = (input_tokens / 1000.0) * config.cost_per_1k_input
+        output_cost = (output_tokens / 1000.0) * config.cost_per_1k_output
+        return input_cost + output_cost
 
     def _get_task_type(self) -> str:
         """

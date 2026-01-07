@@ -1,0 +1,71 @@
+# ATLASsemi Runtime Configuration
+# Copy this file to runtime_config.yaml and customize for your environment
+
+# Runtime mode: "dev" (fast/cheap models) or "runtime" (best models)
+runtime_mode: dev
+
+# API Keys (can also be set via environment variables)
+api_keys:
+  # For GENERAL_LLM tier (public models)
+  anthropic: ${ANTHROPIC_API_KEY}
+  openai: ${OPENAI_API_KEY}
+
+  # For CONFIDENTIAL_FAB tier (factory APIs)
+  factory: ${FACTORY_API_KEY}
+
+  # For TOP_SECRET tier (on-prem)
+  onprem: ${ONPREM_API_KEY}
+
+# Logging configuration
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Security settings
+security:
+  # Default tier if not specified
+  default_tier: GENERAL_LLM
+
+  # Enable audit logging
+  audit_enabled: true
+  audit_log_path: logs/audit.log
+
+# Agent settings
+agents:
+  # Narrative agent
+  narrative:
+    task_type: reasoning
+    max_retries: 3
+
+  # Clarification agent
+  clarification:
+    task_type: reasoning
+    max_questions: 10
+    max_retries: 3
+
+  # Analysis agent
+  analysis:
+    task_type: deep_analysis
+    max_retries: 3
+
+  # Prevention agent
+  prevention:
+    task_type: synthesis
+    max_retries: 3
+
+# Knowledge graph settings
+knowledge_graph:
+  enabled: false
+  # Will be implemented when knowledge graph is added
+  # connection_string: "neo4j://localhost:7687"
+
+# Cost controls
+cost_controls:
+  # Maximum cost per session (USD)
+  max_session_cost: 10.0
+
+  # Warn when session cost exceeds (USD)
+  warn_threshold: 5.0
+
+  # Enable cost tracking
+  track_usage: true

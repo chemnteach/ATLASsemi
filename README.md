@@ -209,22 +209,26 @@ Closes loop
 ### ✅ Implemented
 - Base agent architecture
 - Security tier enforcement
-- Narrative intake agent
+- Model router (dev vs runtime with tier-aware routing)
+- Narrative intake agent (Phase 0)
+- Clarification agent (Phase 1)
+- Analysis agent (Phase 2: 8D mapping)
 - CLI interface
 - Directory structure
+- Cost tracking and usage monitoring
 
 ### 🚧 In Progress
-- Model router (dev vs runtime)
+- Prevention agent (Phase 3)
 - Knowledge graph schema
-- Clarification agent
-- Analysis agent (8D mapping)
+- Factory API integration
+- On-prem API integration
 
 ### 📋 Planned
-- RAG integration
-- Factory API clients
+- RAG integration for historical 8D lookup
 - Web interface
 - Jupyter notebook interface
 - Historical 8D ingestion
+- Automated testing suite
 
 ---
 

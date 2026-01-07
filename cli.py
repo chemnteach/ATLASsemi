@@ -14,6 +14,8 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 from atlassemi.agents.base import ProblemMode, SecurityTier, AgentInput
 from atlassemi.agents.narrative_agent import NarrativeAgent
 from atlassemi.security.tier_enforcer import TierEnforcer, SecurityViolationError
+from atlassemi.config import ModelRouter, RuntimeMode
+import os
 
 
 def main():
@@ -22,6 +24,15 @@ def main():
     print("ATLASsemi - Semiconductor Fab Problem-Solving Assistant")
     print("=" * 60)
     print()
+
+    # Initialize model router
+    runtime_mode_env = os.getenv("ATLASSEMI_RUNTIME_MODE", "dev")
+    runtime_mode = RuntimeMode.RUNTIME if runtime_mode_env == "runtime" else RuntimeMode.DEV
+
+    print(f"Runtime Mode: {runtime_mode.value.upper()}")
+    print()
+
+    model_router = ModelRouter(mode=runtime_mode)
 
     # Step 1: Select mode
     print("Problem-Solving Mode:")
@@ -80,7 +91,7 @@ def main():
     print("=" * 60)
     print()
 
-    narrative_agent = NarrativeAgent()
+    narrative_agent = NarrativeAgent(model_router=model_router)
     print(narrative_agent.generate_intake_prompt())
     print()
 
@@ -115,13 +126,59 @@ def main():
         context={"narrative": narrative}
     )
 
-    # Execute narrative agent (in real implementation, this would call LLM)
-    print("[Note: In this initial version, LLM integration is not yet complete]")
-    print("[Narrative analysis would appear here]")
+    # Execute narrative agent
+    try:
+        output = narrative_agent.execute(agent_input)
+
+        print("=" * 60)
+        print("Narrative Analysis")
+        print("=" * 60)
+        print()
+        print(output.content)
+        print()
+
+        # Show extracted information
+        if output.facts:
+            print("**Facts Identified:**")
+            for fact in output.facts:
+                print(f"  - {fact}")
+            print()
+
+        if output.hypotheses:
+            print("**Hypotheses Identified:**")
+            for hypothesis in output.hypotheses:
+                print(f"  - {hypothesis}")
+            print()
+
+        if output.open_questions:
+            print("**Open Questions:**")
+            for question in output.open_questions:
+                print(f"  - {question}")
+            print()
+
+        # Show 8D phases addressed
+        if output.eight_d_phases_addressed:
+            print(f"**8D Phases Addressed:** {', '.join(output.eight_d_phases_addressed)}")
+            print()
+
+        # Show cost
+        print(f"**Cost for this operation:** ${output.cost_usd:.4f}")
+        print()
+
+    except Exception as e:
+        print(f"Error during narrative analysis: {e}")
+        print()
+        print("Your narrative has been recorded:")
+        print()
+        print(narrative)
+        print()
+
+    # Show usage summary
+    print("=" * 60)
+    print("Session Usage Summary")
+    print("=" * 60)
     print()
-    print("Your narrative has been recorded:")
-    print()
-    print(narrative)
+    print(model_router.get_usage_summary())
     print()
 
     # Next steps
@@ -129,13 +186,12 @@ def main():
     print("Next Steps")
     print("=" * 60)
     print()
-    print("1. Implement model router for LLM calls")
+    print("✓ Model router implemented")
     print("2. Phase 1: Adaptive clarification questions")
     print("3. Phase 2: Analysis with 8D mapping")
     print("4. Phase 3: Prevention and documentation")
     print()
-    print("This is the initial ATLASsemi structure.")
-    print("Core agents and security enforcement are in place.")
+    print("Next: Implement clarification agent to ask context-appropriate questions.")
     print()
 
 
