@@ -1,26 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "*",
-      "Bash(pytest:*)",
-      "Bash(python -m pytest:*)",
-      "Bash(python:*)",
-      "Bash(python3:*)",
-      "Bash(pip:*)",
-      "Bash(pip3:*)",
-      "Bash(git:*)",
-      "Bash(ls:*)",
-      "Bash(cat:*)",
-      "Bash(grep:*)",
-      "Bash(find:*)",
-      "Bash(echo:*)",
-      "Bash(env)",
-      "Bash(source venv/bin/activate)",
-      "Bash(black:*)",
-      "Bash(isort:*)",
-      "Bash(flake8:*)",
-      "Bash(mypy:*)",
-      "Skill(commit)"
-    ]
+      "*"
+    ],
+    "comment": "Tier 1 (General LLM) - Full autonomous access enabled. External APIs allowed. No proprietary fab data."
   }
 }

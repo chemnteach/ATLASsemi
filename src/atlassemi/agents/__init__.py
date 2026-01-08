@@ -10,6 +10,7 @@ from .base import (
 from .narrative_agent import NarrativeAgent, NarrativeAnalysis
 from .clarification_agent import ClarificationAgent, ClarificationSet
 from .analysis_agent import AnalysisAgent, EightDReport, EightDPhaseAnalysis
+from .prevention_agent import PreventionAgent
 
 __all__ = [
     "BaseAgent",
@@ -23,5 +24,6 @@ __all__ = [
     "ClarificationSet",
     "AnalysisAgent",
     "EightDReport",
-    "EightDPhaseAnalysis"
+    "EightDPhaseAnalysis",
+    "PreventionAgent"
 ]

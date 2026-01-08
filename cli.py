@@ -13,6 +13,9 @@ sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from atlassemi.agents.base import ProblemMode, SecurityTier, AgentInput
 from atlassemi.agents.narrative_agent import NarrativeAgent
+from atlassemi.agents.clarification_agent import ClarificationAgent
+from atlassemi.agents.analysis_agent import AnalysisAgent
+from atlassemi.agents.prevention_agent import PreventionAgent
 from atlassemi.security.tier_enforcer import TierEnforcer, SecurityViolationError
 from atlassemi.config import ModelRouter, RuntimeMode
 import os
@@ -173,25 +176,40 @@ def main():
         print(narrative)
         print()
 
+    print("\n" + "="*80)
+    print("PHASE 3: PREVENTION AND LESSONS LEARNED")
+    print("="*80)
+
+    # Execute Prevention Agent
+    prevention_agent = PreventionAgent(model_router=model_router)
+
+    prevention_input = AgentInput(
+        mode=mode,
+        security_tier=security_tier,
+        context={
+            "analysis": output.eight_d_phases_addressed if hasattr(output, 'eight_d_phases_addressed') else [],
+            "root_causes": output.facts if hasattr(output, 'facts') else [],
+            "narrative": narrative,
+        }
+    )
+
+    print("\nExecuting Prevention Agent...")
+    try:
+        prevention_output = prevention_agent.execute(prevention_input)
+
+        print("\n--- Prevention Plan ---")
+        print(prevention_output.content)
+        print(f"\nPhase 3 Cost: ${prevention_output.cost_usd:.4f}")
+    except Exception as e:
+        print(f"Note: Prevention Agent execution skipped ({e})")
+        print("This is expected in demo mode with limited data.")
+
     # Show usage summary
-    print("=" * 60)
+    print("\n" + "=" * 60)
     print("Session Usage Summary")
     print("=" * 60)
     print()
     print(model_router.get_usage_summary())
-    print()
-
-    # Next steps
-    print("=" * 60)
-    print("Next Steps")
-    print("=" * 60)
-    print()
-    print("✓ Model router implemented")
-    print("2. Phase 1: Adaptive clarification questions")
-    print("3. Phase 2: Analysis with 8D mapping")
-    print("4. Phase 3: Prevention and documentation")
-    print()
-    print("Next: Implement clarification agent to ask context-appropriate questions.")
     print()
 
 
