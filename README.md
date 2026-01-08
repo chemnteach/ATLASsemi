@@ -58,30 +58,37 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Or install in development mode
-pip install -e .
+# Run tests to verify installation
+pytest
 ```
 
 ### Configuration
 
-```bash
-# Copy example config
-cp config/runtime_config.example.yaml config/runtime_config.yaml
+Set environment variables in `.env`:
 
-# Edit config to add API keys / endpoints
-# For Confidential tier: Add FACTORY_API_ENDPOINT
-# For Top Secret tier: Add ONPREM_API_ENDPOINT
+```bash
+# Runtime mode (dev = fast/cheap, runtime = best models)
+ATLASSEMI_RUNTIME_MODE=dev
+
+# API key for Tier 1 (General LLM)
+ANTHROPIC_API_KEY=your_key_here
 ```
+
+For complete deployment guide, see **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**
 
 ### Run
 
 ```bash
 # Command-line interface
 python cli.py
-
-# Or if installed
-atlassemi
 ```
+
+The CLI will guide you through:
+1. Selecting problem mode (excursion/improvement/operations)
+2. Selecting security tier (general/confidential/top_secret)
+3. Providing narrative description
+4. Answering clarification questions
+5. Reviewing analysis and prevention plan
 
 ---
 
@@ -153,6 +160,8 @@ ATLASsemi/
 
 ## Workflow
 
+ATLASsemi uses a **WorkflowOrchestrator** to execute all 4 phases sequentially:
+
 ### Phase 0: Narrative Intake
 ```
 User provides free-form problem description
@@ -169,24 +178,26 @@ Reflects back for validation
 
 ### Phase 1: Adaptive Clarification
 ```
-System asks context-appropriate questions
+System generates mode-aware questions
     ↓
 - Why did this surface now?
 - What looks different from normal?
 - Is this localized or widespread?
 - What data is trusted vs uncertain?
     ↓
+User answers (or skips) questions
+    ↓
 Scope and terms stabilize
 ```
 
 ### Phase 2: Structured Analysis (8D Mapping)
 ```
-System analyzes with LLM + Knowledge Graph
+System analyzes with comprehensive context
     ↓
 - Maps findings to 8D phases (D0-D8)
 - Separates facts from hypotheses
-- Queries similar historical excursions
-- Identifies related systems/processes
+- Incorporates clarification answers
+- Identifies gaps in understanding
     ↓
 Generates structured 8D report
 ```
@@ -197,53 +208,86 @@ System documents lessons learned
     ↓
 - Permanent corrective actions (D5)
 - Systemic prevention (D7)
-- Knowledge base updates (D8)
+- Lessons learned (D8)
+- Process improvements
     ↓
 Closes loop
 ```
+
+**Orchestrator Benefits:**
+- Sequential execution with context passing
+- Cost tracking across all phases
+- Comprehensive workflow results
+- Error handling and recovery
 
 ---
 
 ## Development Status
 
-### ✅ Implemented
-- Base agent architecture
-- Security tier enforcement
-- Model router (dev vs runtime with tier-aware routing)
-- Narrative intake agent (Phase 0)
-- Clarification agent (Phase 1)
-- Analysis agent (Phase 2: 8D mapping)
-- CLI interface
-- Directory structure
-- Cost tracking and usage monitoring
+**Version 1.0.0 - Production Ready** 🎉
 
-### 🚧 In Progress
-- Prevention agent (Phase 3)
-- Knowledge graph schema
-- Factory API integration
-- On-prem API integration
+### ✅ v1.0 Complete (2026-01-07)
+- ✅ Base agent architecture
+- ✅ Security tier enforcement (hard blocking)
+- ✅ Model router (dev vs runtime with tier-aware routing)
+- ✅ Narrative intake agent (Phase 0)
+- ✅ Clarification agent (Phase 1)
+- ✅ Analysis agent (Phase 2: 8D mapping)
+- ✅ Prevention agent (Phase 3: lessons learned)
+- ✅ **WorkflowOrchestrator** (chains all 4 phases)
+- ✅ CLI interface (fully integrated)
+- ✅ Cost tracking and usage monitoring
+- ✅ **Comprehensive test suite** (25 tests, 77% coverage)
+- ✅ **Deployment documentation** (see docs/DEPLOYMENT.md)
 
-### 📋 Planned
-- RAG integration for historical 8D lookup
+### Test Coverage (v1.0)
+```
+Overall: 77%
+- Narrative Agent: 99%
+- Clarification Agent: 86%
+- Analysis Agent: 93%
+- Prevention Agent: 97%
+- Orchestrator: Integration tested
+```
+
+### 📋 Future Enhancements
+- Knowledge graph integration
+- Factory API connectors (Tier 2)
+- On-prem LLM integration (Tier 3)
+- RAG for historical 8D lookup
 - Web interface
 - Jupyter notebook interface
-- Historical 8D ingestion
-- Automated testing suite
 
 ---
 
 ## Testing
 
+ATLASsemi includes a comprehensive test suite with 77% coverage:
+
 ```bash
-# Run all tests
+# Run all tests (25 tests)
 pytest
 
-# Run with coverage
+# Run with coverage report
 pytest --cov=atlassemi --cov-report=html
 
-# Run specific test
-pytest tests/test_narrative_agent.py
+# View coverage report
+open htmlcov/index.html
+
+# Run specific test module
+pytest tests/test_narrative_agent.py -v
+
+# Run integration tests
+pytest tests/test_orchestrator.py -v
 ```
+
+**Test Suite:**
+- 13 agent unit tests (narrative, clarification, analysis, prevention)
+- 4 orchestrator integration tests
+- 4 model router tests
+- 4 security tier enforcement tests
+
+All tests use mock LLM responses (no API keys required)
 
 ---
 
@@ -284,5 +328,7 @@ For questions or support, contact the Yield Engineering team.
 
 ---
 
-**Version:** 0.1.0 (Initial Release)
-**Last Updated:** 2026-01-07
+**Version:** 1.0.0 - Production Ready
+**Release Date:** 2026-01-07
+
+For deployment instructions, see **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**

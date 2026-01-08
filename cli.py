@@ -11,12 +11,12 @@ from pathlib import Path
 # Add src to path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from atlassemi.agents.base import ProblemMode, SecurityTier, AgentInput
-from atlassemi.agents.narrative_agent import NarrativeAgent
-from atlassemi.agents.clarification_agent import ClarificationAgent
-from atlassemi.agents.analysis_agent import AnalysisAgent
-from atlassemi.agents.prevention_agent import PreventionAgent
-from atlassemi.security.tier_enforcer import TierEnforcer, SecurityViolationError
+from atlassemi.agents.base import ProblemMode, SecurityTier
+from atlassemi.orchestrator import WorkflowOrchestrator
+from atlassemi.security.tier_enforcer import (
+    TierEnforcer,
+    SecurityViolationError
+)
 from atlassemi.config import ModelRouter, RuntimeMode
 import os
 
@@ -88,20 +88,19 @@ def main():
     print(f"Allowed tools in this tier: {', '.join(enforcer.get_allowed_tools())}")
     print()
 
-    # Step 3: Narrative intake (Phase 0)
+    # Step 3: Narrative intake
     print("=" * 60)
-    print("Phase 0: Narrative Intake")
+    print("Narrative Intake")
     print("=" * 60)
     print()
-
-    narrative_agent = NarrativeAgent(model_router=model_router)
-    print(narrative_agent.generate_intake_prompt())
+    print("Describe your problem in free-form. Be as detailed as you like.")
+    print("Include symptoms, observations, timeline, and any other context.")
+    print()
+    print("(Type your description, then press Ctrl+D on Unix "
+          "or Ctrl+Z on Windows when done)")
     print()
 
     # Get user narrative
-    print("(Type your description, then press Ctrl+D on Unix or Ctrl+Z on Windows when done)")
-    print()
-
     narrative_lines = []
     try:
         while True:
@@ -118,91 +117,73 @@ def main():
 
     print()
     print("=" * 60)
-    print("Processing narrative...")
+    print("Executing 4-Phase Workflow")
     print("=" * 60)
     print()
 
-    # Create agent input
-    agent_input = AgentInput(
-        mode=mode,
-        security_tier=tier,
-        context={"narrative": narrative}
-    )
+    # Initialize orchestrator
+    orchestrator = WorkflowOrchestrator(model_router=model_router)
 
-    # Execute narrative agent
+    # Execute full workflow
     try:
-        output = narrative_agent.execute(agent_input)
+        result = orchestrator.run_workflow(
+            narrative=narrative,
+            mode=mode,
+            tier=tier,
+            answer_collector=None  # Use default CLI input
+        )
 
-        print("=" * 60)
-        print("Narrative Analysis")
+        # Display results
+        print("\n" + "=" * 60)
+        print("WORKFLOW COMPLETE")
         print("=" * 60)
         print()
-        print(output.content)
+
+        # Summary statistics
+        print("**Summary:**")
+        print(f"  - Phases Completed: {len(result.phases_completed)}")
+        print(f"  - Facts Identified: {result.facts_identified}")
+        print(f"  - Hypotheses Generated: {result.hypotheses_identified}")
+        print(f"  - 8D Phases Addressed: "
+              f"{', '.join(result.eight_d_phases_addressed)}")
+        print(f"  - Total Cost: ${result.total_cost_usd:.4f}")
         print()
 
-        # Show extracted information
-        if output.facts:
-            print("**Facts Identified:**")
-            for fact in output.facts:
+        # Display key outputs
+        print("\n" + "=" * 60)
+        print("KEY FINDINGS")
+        print("=" * 60)
+        print()
+
+        if result.narrative_output.facts:
+            print("**Facts:**")
+            for fact in result.narrative_output.facts:
                 print(f"  - {fact}")
             print()
 
-        if output.hypotheses:
-            print("**Hypotheses Identified:**")
-            for hypothesis in output.hypotheses:
+        if result.analysis_output.hypotheses:
+            print("**Root Cause Hypotheses:**")
+            for hypothesis in result.analysis_output.hypotheses:
                 print(f"  - {hypothesis}")
             print()
 
-        if output.open_questions:
-            print("**Open Questions:**")
-            for question in output.open_questions:
-                print(f"  - {question}")
-            print()
-
-        # Show 8D phases addressed
-        if output.eight_d_phases_addressed:
-            print(f"**8D Phases Addressed:** {', '.join(output.eight_d_phases_addressed)}")
-            print()
-
-        # Show cost
-        print(f"**Cost for this operation:** ${output.cost_usd:.4f}")
+        print("\n" + "=" * 60)
+        print("PREVENTION PLAN")
+        print("=" * 60)
+        print()
+        print(result.prevention_output.content)
         print()
 
     except Exception as e:
-        print(f"Error during narrative analysis: {e}")
+        print(f"Error during workflow execution: {e}")
+        print()
+        import traceback
+        traceback.print_exc()
         print()
         print("Your narrative has been recorded:")
         print()
         print(narrative)
         print()
-
-    print("\n" + "="*80)
-    print("PHASE 3: PREVENTION AND LESSONS LEARNED")
-    print("="*80)
-
-    # Execute Prevention Agent
-    prevention_agent = PreventionAgent(model_router=model_router)
-
-    prevention_input = AgentInput(
-        mode=mode,
-        security_tier=security_tier,
-        context={
-            "analysis": output.eight_d_phases_addressed if hasattr(output, 'eight_d_phases_addressed') else [],
-            "root_causes": output.facts if hasattr(output, 'facts') else [],
-            "narrative": narrative,
-        }
-    )
-
-    print("\nExecuting Prevention Agent...")
-    try:
-        prevention_output = prevention_agent.execute(prevention_input)
-
-        print("\n--- Prevention Plan ---")
-        print(prevention_output.content)
-        print(f"\nPhase 3 Cost: ${prevention_output.cost_usd:.4f}")
-    except Exception as e:
-        print(f"Note: Prevention Agent execution skipped ({e})")
-        print("This is expected in demo mode with limited data.")
 
     # Show usage summary
     print("\n" + "=" * 60)
