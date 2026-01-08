@@ -1,0 +1,31 @@
+# Example Document Download List for ATLASsemi RAG
+#
+# Format: folder: URL [optional_custom_name]
+#
+# Supported folders:
+#   - methodologies: 8D, DMAIC, 5 Whys, root cause analysis
+#   - yield: SPC, defect analysis, Cpk, excursion response
+#   - operations: Factory Physics, cycle time, bottleneck analysis
+#   - organizational: Retention, culture, engagement
+#   - support: Statistics, communication, project management
+#
+# Usage:
+#   1. Copy this file: cp docs_to_download.example.txt my_docs.txt
+#   2. Edit my_docs.txt with your actual URLs
+#   3. Run: python scripts/download_docs.py my_docs.txt
+
+# Methodologies (Universal problem-solving)
+methodologies: https://example.com/8d-problem-solving-handbook.pdf
+methodologies: https://example.com/dmaic-guide.html [dmaic_guide.md]
+
+# Yield (Semiconductor-specific)
+yield: https://example.com/spc-handbook.pdf
+yield: https://example.com/defect-classification-atlas.pdf [defect_atlas.pdf]
+
+# Operations (Factory Physics, throughput)
+operations: https://example.com/factory-physics-summary.pdf
+operations: https://example.com/cycle-time-optimization.html
+
+# Support (Statistics, communication)
+support: https://example.com/statistical-methods-engineers.pdf
+support: https://example.com/data-visualization-best-practices.pdf
