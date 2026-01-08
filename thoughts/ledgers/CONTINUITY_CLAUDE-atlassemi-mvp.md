@@ -76,6 +76,23 @@ Completed:
 
 **Current Focus:** Document collection phase (user gathering PDFs/HTML)
 
+📋 **v1.2 DATABASE PIPELINE DEBUGGING PLAN COMPLETE (2026-01-08)**
+
+- Done:
+  - [x] Technical research completed (SQL Server DMVs, Power BI API, embeddings, graph DBs)
+  - [x] Implementation plan created (thoughts/shared/plans/2026-01-08-v1.2-database-pipeline-debugging.md)
+  - [x] Tech choices validated against 2024-2025 best practices (all VALID ✓)
+  - [x] 6-phase implementation approach defined (25-35 hours total)
+- Next (for new data scientist):
+  - [ ] Phase 1: SQL Server Metadata Extraction
+  - [ ] Phase 2: Power BI Lineage Extraction
+  - [ ] Phase 3: Code Embedding & Semantic Search
+  - [ ] Phase 4: Dependency Graph Construction
+  - [ ] Phase 5: Analysis Agent Integration (ProblemMode.DATA_PIPELINE)
+  - [ ] Phase 6: Testing with Production Tickets
+
+**Current Focus:** Plan ready for new data scientist onboarding (parallel workstream with v1.1)
+
 ## Technical Debt Tracking
 
 **Document:** `TECHNICAL_DEBT.md` (in repo root)
